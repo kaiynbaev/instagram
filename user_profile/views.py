@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import F
 
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status, parsers
 from rest_framework.response import Response
@@ -11,6 +12,8 @@ from .models import Profile
 
 
 class ProfileViewSet(ModelViewSet):
+    
+    permission_classes = [IsAuthenticated]
     queryset = Profile.objects.all()
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
     
@@ -25,6 +28,8 @@ class ProfileViewSet(ModelViewSet):
     
 class FollowersList(APIView):
     
+    permission_classes = [IsAuthenticated]
+    
     def get(self, *args, **kwargs):
         return Response(
             status=status.HTTP_200_OK
@@ -33,6 +38,7 @@ class FollowersList(APIView):
         
 class FollowersList(APIView):
     
+    permission_classes = [IsAuthenticated]
     
     def get(self, *args, **kwargs):
         client_id = kwargs.get('id')
@@ -50,6 +56,7 @@ class FollowersList(APIView):
         
 class FollowingList(APIView):
     
+    permission_classes = [IsAuthenticated]
     
     def get(self, *args, **kwargs):
         client_id = kwargs.get('id')
@@ -65,11 +72,35 @@ class FollowingList(APIView):
         )
 
 
+class Subscribe(APIView):
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self, *args, **kwargs):
+        # if (current_account_id := kwargs.get('current_account_id')) is not None:
+        #     current_account = get_object_or_404(Profile, id=current_account_id)
+        if (subscribe_account_id := kwargs.get('subscribe_account_id')) is not None:
+            subscribe_account = get_object_or_404(Profile, id=subscribe_account_id)
+        if (current_account := self.request.user.profile) == subscribe_account:
+            return Response(
+            status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            data={'detail': f'{subscribe_account} не может подписаться на самого себя!'}
+        )
+        subscribe_account.follows.add(
+            current_account
+        )
+        
+        return Response(
+            status=status.HTTP_200_OK
+        )
+        
+
 class Unsubscribe(APIView):
     
+    permission_classes = [IsAuthenticated]
+    
     def get(self, *args, **kwargs):
-        if (current_account_id := kwargs.get('current_account_id')) is not None:
-            current_account = get_object_or_404(Profile, id=current_account_id)
+        current_account = self.request.user.profile
         if (unsubscribe_account_id := kwargs.get('unsubscribe_account_id')) is not None:
             unsubscribe_account = get_object_or_404(Profile, id=unsubscribe_account_id)
         

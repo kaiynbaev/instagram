@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Profile(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name='profile',
@@ -21,7 +21,8 @@ class Profile(models.Model):
     follows = models.ManyToManyField(
             "Profile", 
             related_name="followed_by",
-            blank=True
+            blank=True,
+            verbose_name='Подписки'
         )
     title = models.CharField(
         max_length=255,
@@ -29,7 +30,7 @@ class Profile(models.Model):
     )
     description = models.CharField(
         max_length=500,
-        verbose_name='Заголовок'
+        verbose_name='Описание'
     )
     
     def current_follows_count(self) -> int:
@@ -60,4 +61,3 @@ class Profile(models.Model):
     class Meta:
         verbose_name = 'Профиль'
         verbose_name_plural = 'Профили'
-    
