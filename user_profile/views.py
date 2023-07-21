@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import F
 
+from django_filters import rest_framework as filters
+from rest_framework import filters as r_filters
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -16,13 +18,15 @@ class ProfileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Profile.objects.all()
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
+    filter_backends = (filters.DjangoFilterBackend, r_filters.SearchFilter)
+    filterset_fields = ('user__id',)
+    search_fields = ('user__username',)
     
     def get_serializer_class(self, *args, **kwargs):
         if self.action in 'update':
             return UpdateProfileSerializer
         elif self.action == 'partial_update':
             return PatchUpdateProfileSerializer
-        print(self.action, '\n\n\n\n\n\n\n')
         return ProfileSerializers
     
     

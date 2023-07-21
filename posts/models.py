@@ -2,6 +2,43 @@ from django.db import models
 from user_profile.models import Profile
 
 # Create your models here.
+class Notification(models.Model):
+    from_profile = models.ForeignKey(
+        Profile,
+        on_delete=models.PROTECT,
+        related_name='from_me_notifications',
+        verbose_name='От профиля'
+    )
+    to_profile = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='to_me_notifications',
+        verbose_name='Для профиля'
+    )
+    message = models.CharField(
+        max_length=500,
+        verbose_name='Текст уведомления'
+    )
+    is_view = models.BooleanField(
+        verbose_name='Просмотрено',
+        choices=((True, 'Да'), (False, 'Нет')),
+        default=False
+    )
+    create_date = models.DateTimeField(
+        auto_now_add=True
+    )
+    update_date = models.DateTimeField(
+        auto_now=True
+    )
+    
+    def __str__(self):
+        return f"{self.to_profile} {self.message}!"
+    
+    class Meta:
+        verbose_name = 'Уведомление'
+        verbose_name_plural = 'Уведомления'
+    
+
 class Post(models.Model):
     profile = models.ForeignKey(
         Profile,
@@ -58,6 +95,7 @@ class Like(models.Model):
     class Meta:
         verbose_name = 'Лайк'
         verbose_name_plural = 'Лайки'
+        unique_together = ('author', 'post')
 
 
 class Comment(models.Model):
