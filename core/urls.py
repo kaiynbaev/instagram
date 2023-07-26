@@ -29,6 +29,7 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.jwt')),
     
     path('api/v1/', include('posts.urls')),
+    path('chat/', include('chat.urls')),
     path('', include('user_profile.urls')),
     
     *auth_urlpatterns,

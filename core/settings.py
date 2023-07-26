@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # installed apps
+    'daphne',
+    # -------------
     'django.contrib.staticfiles',
     
     # installed apps
@@ -59,9 +62,12 @@ INSTALLED_APPS = [
     'djoser',
     'django_filters',
     
+    'channels',
+    
     # Own services
     'user_profile',
-    'posts'
+    'posts',
+    'chat'
 ]
 
 MIDDLEWARE = [
@@ -187,3 +193,12 @@ EMAIL_PORT = 587
 # EMAIL_USE_SSL = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+
+ASGI_APPLICATION = "core.asgi.application" #routing.py will handle the ASGI
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': "channels.layers.InMemoryChannelLayer"
+#         }
+#     }
+
